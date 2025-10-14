@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Registration</title>
+    
+    <!-- Using Tailwind from CDN for simplicity -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind gray-50 */
+        }
+        .camera-view {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 0.5rem;
+            border: 2px solid #e5e7eb; /* Tailwind gray-200 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-12 px-4">
+
+    <div class="w-full max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-xl">
+        
+        <!-- The Registration Form Container -->
+        <div id="formContainer">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Voter Registration Form</h1>
+                <p class="text-gray-500">Please fill in your details accurately.</p>
+            </div>
+
+            <form id="registrationForm" class="space-y-6">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="aadhaarName" class="block text-sm font-medium text-gray-700">Name (As per Aadhaar)</label>
+                        <input type="text" id="aadhaarName" name="aadhaarName" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="dob" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                        <input type="date" id="dob" name="dob" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <p id="ageMessage" class="text-sm mt-1"></p>
+                    </div>
+                    <div>
+                        <label for="aadhaarNumber" class="block text-sm font-medium text-gray-700">Aadhaar Number</label>
+                        <input type="text" id="aadhaarNumber" name="aadhaarNumber" pattern="\d{12}" title="Enter a 12-digit Aadhaar number" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                     <div>
+                        <label for="voterId" class="block text-sm font-medium text-gray-700">Voter ID</label>
+                        <input type="text" id="voterId" name="voterId" pattern="[A-Z]{3}[0-9]{7}" title="Enter a valid Voter ID (e.g., ABC1234567)" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div class="border-t pt-6">
+                     <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Aadhaar Registered Phone Number</label>
+                    <div class="flex items-center space-x-4 mt-1">
+                        <input type="tel" id="phoneNumber" name="phoneNumber" pattern="[0-9]{10}" title="Enter a 10-digit phone number" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <button type="button" id="sendOtpBtn" class="bg-indigo-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-600 transition whitespace-nowrap">Send OTP</button>
+                    </div>
+                    <div id="otpSection" class="hidden mt-4">
+                        <label for="otp" class="block text-sm font-medium text-gray-700">Enter OTP</label>
+                        <input type="text" id="otp" name="otp" pattern="\d{6}" title="Enter a 6-digit OTP" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <p class="text-sm text-green-600 mt-1">Note: For this demo, any 6-digit number will work.</p>
+                    </div>
+                </div>
+
+                <div id="photoCaptureSection" class="hidden border-t pt-6 text-center">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Live Photo Verification</h3>
+                    <p id="emotionPrompt" class="text-blue-600 font-medium mb-4">Click "Start Camera" to begin.</p>
+                    <video id="video" class="camera-view mx-auto hidden" autoplay muted playsinline></video>
+                    <canvas id="canvas" class="hidden"></canvas>
+                    <img id="photoPreview" class="camera-view mx-auto hidden" alt="Captured Photo"/>
+                    <div class="mt-4 flex justify-center space-x-4">
+                        <button type="button" id="startCameraBtn" class="bg-gray-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition">Start Camera</button>
+                        <button type="button" id="captureBtn" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition hidden">Capture Photo</button>
+                    </div>
+                </div>
+                
+                <div class="text-center border-t pt-6">
+                    <button type="submit" id="registerBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400" disabled>Register</button>
+                    <p id="errorMessage" class="hidden mt-4 text-lg text-red-600 font-semibold"></p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Message Container - Initially Hidden -->
+        <div id="successContainer" class="hidden text-center py-10">
+            <svg class="mx-auto h-16 w-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 class="mt-4 text-2xl font-bold text-gray-800">Registration Successful!</h2>
+            <p id="successMessage" class="mt-2 text-gray-600"></p>
+            <a href="home.html" class="mt-6 inline-block bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">
+                Back to Home
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        const formContainer = document.getElementById('formContainer');
+        const registrationForm = document.getElementById('registrationForm');
+        const successContainer = document.getElementById('successContainer');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const dobInput = document.getElementById('dob');
+        const ageMessage = document.getElementById('ageMessage');
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+        const otpSection = document.getElementById('otpSection');
+        const photoCaptureSection = document.getElementById('photoCaptureSection');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const photoPreview = document.getElementById('photoPreview');
+        const emotionPrompt = document.getElementById('emotionPrompt');
+        
+        let isAgeValid = false;
+        let isOtpVerified = false;
+        let capturedImageData = null;
+        const emotions = ['Please Smile', 'Show a Surprised Look', 'Look Neutral', 'Show a Happy Face'];
+
+        function checkFormCompletion() {
+            registerBtn.disabled = !(isAgeValid && isOtpVerified && capturedImageData);
+        }
+
+        dobInput.addEventListener('change', () => {
+            const dob = new Date(dobInput.value);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) { age--; }
+
+            if (age >= 18) {
+                ageMessage.textContent = `Age: ${age}. You are eligible to vote.`;
+                ageMessage.style.color = 'green';
+                isAgeValid = true;
+            } else {
+                ageMessage.textContent = `Age: ${age}. You must be 18 or older.`;
+                ageMessage.style.color = 'red';
+                isAgeValid = false;
+            }
+            checkFormCompletion();
+        });
+
+        sendOtpBtn.addEventListener('click', () => {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            if (!/^\d{10}$/.test(phoneNumber)) {
+                alert('Please enter a valid 10-digit phone number.');
+                return;
+            }
+            alert('OTP has been sent (simulated).');
+            otpSection.classList.remove('hidden');
+            sendOtpBtn.textContent = 'Resend OTP';
+            
+            document.getElementById('otp').addEventListener('input', (e) => {
+                isOtpVerified = /^\d{6}$/.test(e.target.value);
+                if (isOtpVerified) {
+                    photoCaptureSection.classList.remove('hidden');
+                }
+                checkFormCompletion();
+            });
+        });
+        
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = stream;
+                video.classList.remove('hidden');
+                captureBtn.classList.remove('hidden');
+                startCameraBtn.classList.add('hidden');
+                photoPreview.classList.add('hidden');
+                
+                emotionPrompt.textContent = emotions[Math.floor(Math.random() * emotions.length)];
+
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+                emotionPrompt.textContent = 'Could not access camera. Please check permissions.';
+                emotionPrompt.style.color = 'red';
+            }
+        });
+
+        captureBtn.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            capturedImageData = canvas.toDataURL('image/jpeg');
+            photoPreview.src = capturedImageData;
+            
+            video.classList.add('hidden');
+            photoPreview.classList.remove('hidden');
+            captureBtn.classList.add('hidden');
+            startCameraBtn.classList.remove('hidden');
+            startCameraBtn.textContent = 'Retake Photo';
+
+            video.srcObject.getTracks().forEach(track => track.stop());
+            checkFormCompletion();
+        });
+
+        registrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Submitting...';
+            errorMessage.classList.add('hidden');
+
+            const formData = new FormData(registrationForm);
+            const data = {
+                name: formData.get('aadhaarName'),
+                dob: formData.get('dob'),
+                aadhaar_number: formData.get('aadhaarNumber'),
+                voter_id: formData.get('voterId'),
+                phone_number: formData.get('phoneNumber'),
+                photo: capturedImageData
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    formContainer.classList.add('hidden');
+                    successMessage.textContent = result.message; 
+                    successContainer.classList.remove('hidden');
+                } else {
+                    throw new Error(result.error || 'An unknown server error occurred.');
+                }
+
+            } catch (error) {
+                errorMessage.textContent = `Error: ${error.message}`;
+                errorMessage.classList.remove('hidden');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+            }
+        });
+
+    </script>
+</body>
+</html>
+
